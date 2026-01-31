@@ -1,0 +1,752 @@
+---
+title: "Redis কি এবং কেন ব্যবহার করবেন? NestJS দিয়ে বাস্তব উদাহরণ"
+date: "2026-01-31"
+description: "Redis caching এবং data storage কিভাবে আপনার application এর performance বাড়ায়, কখন ব্যবহার করবেন এবং NestJS দিয়ে implementation দেখুন।"
+tags: ["bangla", "redis", "nestjs", "caching", "performance", "backend"]
+published: true
+---
+
+# Redis কি এবং কেন ব্যবহার করবেন?
+
+আপনার database query প্রতিবার একই data fetch করার জন্য 500ms+ সময় নিচ্ছে? Users একই page বারবার reload করছে কিন্তু data change হচ্ছে না? Redis হলো এই সমস্যার perfect সমাধান।
+
+## Redis কি?
+
+Redis হলো একটি **in-memory data store** যা super fast data access দেয়। এটি RAM এ data রাখে, তাই disk-based database এর চেয়ে হাজার গুণ দ্রুত।
+
+**Real-life উদাহরণ:**  
+ধরুন আপনার library তে একটা book আছে যা সবাই পড়তে চায়। প্রতিবার library তে গিয়ে খুঁজে আনার পরিবর্তে, আপনি সেই book টা আপনার desk এ রেখে দিলেন। যখন দরকার তখন instant পেয়ে যাবেন। Redis হলো সেই desk - যেখানে frequently used data রাখা হয়।
+
+## কেন Redis ব্যবহার করবেন?
+
+### 1. **Blazing Fast Performance**
+RAM থেকে data read/write - microseconds এ!
+
+### 2. **Reduce Database Load**
+বারবার same query না চালিয়ে cached data serve করুন।
+
+### 3. **Multiple Data Structures**
+String, Hash, List, Set, Sorted Set - আপনার need অনুযায়ী।
+
+### 4. **Built-in Expiration**
+Data automatically expire হয়ে যাবে - manual cleanup লাগবে না।
+
+### 5. **Session Management**
+User sessions fast এবং scalable way তে store করুন।
+
+## কখন ব্যবহার করবেন?
+
+### Problem 1: Slow Database Queries
+
+```typescript
+// ❌ সমস্যা: প্রতিবার database hit - slow!
+async getProducts() {
+  // Database query - 500ms
+  const products = await this.productRepo.find({
+    relations: ['category', 'images', 'reviews'],
+    order: { createdAt: 'DESC' },
+    take: 100,
+  });
+  
+  return products; // Every request = 500ms delay
+}
+```
+
+### Problem 2: Rate Limiting
+
+```typescript
+// ❌ Database এ rate limit track করা - inefficient!
+async checkRateLimit(userId: string) {
+  const requests = await this.requestRepo.count({
+    where: {
+      userId,
+      createdAt: MoreThan(new Date(Date.now() - 60000)),
+    },
+  });
+  
+  return requests > 100; // Database hit every request!
+}
+```
+
+### Problem 3: Real-time Leaderboard
+
+```typescript
+// ❌ Database sort - expensive!
+async getLeaderboard() {
+  // Complex query with sorting - 2-3 seconds!
+  const users = await this.userRepo.find({
+    order: { score: 'DESC' },
+    take: 100,
+  });
+  
+  return users;
+}
+```
+
+## Redis দিয়ে সমাধান
+
+### Architecture বুঝি
+
+```
+Request → Check Cache (Redis) → Cache Hit? → Return Data (Fast!)
+                ↓
+           Cache Miss
+                ↓
+         Query Database
+                ↓
+         Store in Cache
+                ↓
+          Return Data
+```
+
+## NestJS দিয়ে Implementation
+
+### Step 1: Setup করি
+
+```bash
+npm install @nestjs/cache-manager cache-manager
+npm install cache-manager-redis-store
+npm install @types/cache-manager-redis-store --save-dev
+```
+
+### Step 2: Redis Module Configuration
+
+```typescript
+// redis.module.ts
+import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
+
+@Module({
+  imports: [
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || 6379,
+      ttl: 300, // Default TTL: 5 minutes
+    }),
+  ],
+})
+export class RedisModule {}
+```
+
+### Step 3: Basic Caching
+
+```typescript
+// product.service.ts
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
+@Injectable()
+export class ProductService {
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private productRepo: ProductRepository,
+  ) {}
+
+  async getProducts() {
+    const cacheKey = 'products:all';
+    
+    // 1. Check cache first
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) {
+      console.log('Cache hit! 🚀');
+      return cached; // Instant response!
+    }
+    
+    console.log('Cache miss - querying database...');
+    
+    // 2. Query database
+    const products = await this.productRepo.find({
+      relations: ['category', 'images'],
+      order: { createdAt: 'DESC' },
+      take: 100,
+    });
+    
+    // 3. Store in cache for 5 minutes
+    await this.cacheManager.set(cacheKey, products, 300);
+    
+    return products;
+  }
+
+  async getProductById(id: string) {
+    const cacheKey = `product:${id}`;
+    
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+    
+    const product = await this.productRepo.findOne({
+      where: { id },
+      relations: ['category', 'images', 'reviews'],
+    });
+    
+    // Cache individual product for 10 minutes
+    await this.cacheManager.set(cacheKey, product, 600);
+    
+    return product;
+  }
+
+  async updateProduct(id: string, data: UpdateProductDto) {
+    const product = await this.productRepo.update(id, data);
+    
+    // ⚠️ Important: Invalidate cache after update
+    await this.cacheManager.del(`product:${id}`);
+    await this.cacheManager.del('products:all');
+    
+    return product;
+  }
+}
+```
+
+## Real-world Example: Rate Limiting
+
+```typescript
+// rate-limit.service.ts
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
+@Injectable()
+export class RateLimitService {
+  constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
+
+  async checkRateLimit(
+    userId: string,
+    limit: number = 100,
+    windowSeconds: number = 60,
+  ): Promise<{ allowed: boolean; remaining: number }> {
+    const key = `rate_limit:${userId}`;
+    
+    // Get current request count
+    const current = await this.cache.get<number>(key) || 0;
+    
+    if (current >= limit) {
+      return { allowed: false, remaining: 0 };
+    }
+    
+    // Increment counter
+    const newCount = current + 1;
+    await this.cache.set(key, newCount, windowSeconds);
+    
+    return {
+      allowed: true,
+      remaining: limit - newCount,
+    };
+  }
+}
+
+// rate-limit.guard.ts
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+
+@Injectable()
+export class RateLimitGuard implements CanActivate {
+  constructor(private rateLimitService: RateLimitService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const userId = request.user?.id || request.ip;
+    
+    const { allowed, remaining } = await this.rateLimitService.checkRateLimit(
+      userId,
+      100, // 100 requests
+      60,  // per minute
+    );
+    
+    // Add headers
+    request.res.setHeader('X-RateLimit-Remaining', remaining);
+    
+    if (!allowed) {
+      throw new HttpException('Rate limit exceeded', 429);
+    }
+    
+    return true;
+  }
+}
+
+// Usage in controller
+@Controller('api')
+@UseGuards(RateLimitGuard)
+export class ApiController {
+  @Get('data')
+  getData() {
+    return { message: 'Protected by rate limit' };
+  }
+}
+```
+
+## Advanced: Leaderboard with Sorted Sets
+
+```typescript
+// leaderboard.service.ts
+import { Injectable } from '@nestjs/common';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
+
+@Injectable()
+export class LeaderboardService {
+  constructor(@InjectRedis() private redis: Redis) {}
+
+  // Add or update user score
+  async updateScore(userId: string, score: number) {
+    await this.redis.zadd('leaderboard', score, userId);
+  }
+
+  // Get top 10 players
+  async getTopPlayers(count: number = 10) {
+    // ZREVRANGE returns highest to lowest
+    const results = await this.redis.zrevrange(
+      'leaderboard',
+      0,
+      count - 1,
+      'WITHSCORES',
+    );
+    
+    // Format: [userId, score, userId, score, ...]
+    const leaderboard = [];
+    for (let i = 0; i < results.length; i += 2) {
+      leaderboard.push({
+        userId: results[i],
+        score: parseInt(results[i + 1]),
+        rank: Math.floor(i / 2) + 1,
+      });
+    }
+    
+    return leaderboard;
+  }
+
+  // Get user's rank
+  async getUserRank(userId: string) {
+    const rank = await this.redis.zrevrank('leaderboard', userId);
+    const score = await this.redis.zscore('leaderboard', userId);
+    
+    return {
+      rank: rank !== null ? rank + 1 : null,
+      score: score ? parseInt(score) : 0,
+    };
+  }
+
+  // Get players around a specific user
+  async getPlayersAround(userId: string, range: number = 5) {
+    const userRank = await this.redis.zrevrank('leaderboard', userId);
+    
+    if (userRank === null) return [];
+    
+    const start = Math.max(0, userRank - range);
+    const end = userRank + range;
+    
+    const results = await this.redis.zrevrange(
+      'leaderboard',
+      start,
+      end,
+      'WITHSCORES',
+    );
+    
+    const players = [];
+    for (let i = 0; i < results.length; i += 2) {
+      players.push({
+        userId: results[i],
+        score: parseInt(results[i + 1]),
+        rank: start + Math.floor(i / 2) + 1,
+      });
+    }
+    
+    return players;
+  }
+}
+```
+
+## Session Management
+
+```typescript
+// session.service.ts
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
+interface UserSession {
+  userId: string;
+  email: string;
+  role: string;
+  loginAt: Date;
+}
+
+@Injectable()
+export class SessionService {
+  constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
+
+  async createSession(
+    sessionId: string,
+    userData: UserSession,
+    expirySeconds: number = 3600, // 1 hour
+  ) {
+    const key = `session:${sessionId}`;
+    await this.cache.set(key, userData, expirySeconds);
+  }
+
+  async getSession(sessionId: string): Promise<UserSession | null> {
+    const key = `session:${sessionId}`;
+    return await this.cache.get<UserSession>(key);
+  }
+
+  async extendSession(sessionId: string, expirySeconds: number = 3600) {
+    const key = `session:${sessionId}`;
+    const session = await this.getSession(sessionId);
+    
+    if (session) {
+      await this.cache.set(key, session, expirySeconds);
+    }
+  }
+
+  async deleteSession(sessionId: string) {
+    const key = `session:${sessionId}`;
+    await this.cache.del(key);
+  }
+
+  async getUserSessions(userId: string) {
+    // Note: This requires scanning, not ideal for production
+    // Better to maintain a separate set of session IDs per user
+    const key = `user_sessions:${userId}`;
+    return await this.cache.get<string[]>(key) || [];
+  }
+}
+```
+
+## Caching Strategies
+
+### 1. Cache-Aside (Lazy Loading)
+
+```typescript
+async getData(id: string) {
+  // Try cache first
+  let data = await this.cache.get(id);
+  
+  if (!data) {
+    // Cache miss - load from DB
+    data = await this.db.find(id);
+    await this.cache.set(id, data, 300);
+  }
+  
+  return data;
+}
+```
+
+### 2. Write-Through
+
+```typescript
+async updateData(id: string, newData: any) {
+  // Update DB and cache together
+  await this.db.update(id, newData);
+  await this.cache.set(id, newData, 300);
+}
+```
+
+### 3. Write-Behind (Write-Back)
+
+```typescript
+async updateData(id: string, newData: any) {
+  // Update cache immediately
+  await this.cache.set(id, newData, 300);
+  
+  // Queue DB update for later (async)
+  await this.queue.add('update-db', { id, newData });
+}
+```
+
+## Cache Invalidation Patterns
+
+### Time-based Expiration
+
+```typescript
+// Cache for 5 minutes
+await this.cache.set('key', data, 300);
+```
+
+### Tag-based Invalidation
+
+```typescript
+async invalidateProductCache(productId: string) {
+  // Delete specific product
+  await this.cache.del(`product:${productId}`);
+  
+  // Delete related caches
+  await this.cache.del('products:all');
+  await this.cache.del('products:featured');
+  await this.cache.del(`products:category:${categoryId}`);
+}
+```
+
+### Event-based Invalidation
+
+```typescript
+@Injectable()
+export class ProductService {
+  constructor(
+    @Inject(CACHE_MANAGER) private cache: Cache,
+    private eventEmitter: EventEmitter2,
+  ) {
+    // Listen for product updates
+    this.eventEmitter.on('product.updated', (productId) => {
+      this.invalidateCache(productId);
+    });
+  }
+
+  async updateProduct(id: string, data: any) {
+    await this.productRepo.update(id, data);
+    
+    // Emit event
+    this.eventEmitter.emit('product.updated', id);
+  }
+}
+```
+
+## Performance Monitoring
+
+```typescript
+// cache-metrics.service.ts
+@Injectable()
+export class CacheMetricsService {
+  private hits = 0;
+  private misses = 0;
+
+  recordHit() {
+    this.hits++;
+  }
+
+  recordMiss() {
+    this.misses++;
+  }
+
+  getHitRate() {
+    const total = this.hits + this.misses;
+    return total === 0 ? 0 : (this.hits / total) * 100;
+  }
+
+  getStats() {
+    return {
+      hits: this.hits,
+      misses: this.misses,
+      hitRate: this.getHitRate().toFixed(2) + '%',
+    };
+  }
+}
+
+// Usage in service
+async getData(key: string) {
+  const cached = await this.cache.get(key);
+  
+  if (cached) {
+    this.metrics.recordHit();
+    return cached;
+  }
+  
+  this.metrics.recordMiss();
+  const data = await this.db.find(key);
+  await this.cache.set(key, data);
+  return data;
+}
+```
+
+## Best Practices
+
+### 1. Set Appropriate TTL
+
+```typescript
+// Short-lived data
+await this.cache.set('session', data, 300); // 5 minutes
+
+// Medium-lived data
+await this.cache.set('user_profile', data, 3600); // 1 hour
+
+// Long-lived data
+await this.cache.set('config', data, 86400); // 24 hours
+```
+
+### 2. Use Namespaced Keys
+
+```typescript
+// ✅ Good - organized and searchable
+const userKey = `user:${userId}`;
+const productKey = `product:${productId}`;
+const cartKey = `cart:${userId}:${sessionId}`;
+
+// ❌ Bad - hard to manage
+const key1 = userId;
+const key2 = `${userId}_cart`;
+```
+
+### 3. Handle Cache Failures Gracefully
+
+```typescript
+async getData(id: string) {
+  try {
+    const cached = await this.cache.get(id);
+    if (cached) return cached;
+  } catch (error) {
+    // Cache failure - log but continue
+    console.error('Cache error:', error);
+  }
+  
+  // Always fall back to database
+  return await this.db.find(id);
+}
+```
+
+### 4. Avoid Caching Large Objects
+
+```typescript
+// ❌ Bad - caching huge object
+await this.cache.set('all_users', allUsers); // 10MB+
+
+// ✅ Good - cache paginated or filtered
+await this.cache.set('users:page:1', firstPage);
+await this.cache.set('users:active', activeUsers);
+```
+
+## Common Pitfalls
+
+### 1. Cache Stampede
+
+```typescript
+// ❌ Problem: All requests hit DB when cache expires
+async getData() {
+  const cached = await this.cache.get('data');
+  if (!cached) {
+    // 1000 concurrent requests all query DB!
+    return await this.db.find();
+  }
+}
+
+// ✅ Solution: Use locking
+async getData() {
+  const cached = await this.cache.get('data');
+  if (cached) return cached;
+  
+  const lockKey = 'lock:data';
+  const lock = await this.redis.set(lockKey, '1', 'EX', 10, 'NX');
+  
+  if (lock) {
+    // Only one request rebuilds cache
+    const data = await this.db.find();
+    await this.cache.set('data', data, 300);
+    await this.redis.del(lockKey);
+    return data;
+  } else {
+    // Others wait and retry
+    await this.sleep(100);
+    return this.getData();
+  }
+}
+```
+
+### 2. Stale Data
+
+```typescript
+// ⚠️ Always invalidate related caches
+async updateUser(id: string, data: any) {
+  await this.userRepo.update(id, data);
+  
+  // Don't forget these!
+  await this.cache.del(`user:${id}`);
+  await this.cache.del(`user:${id}:profile`);
+  await this.cache.del(`user:${id}:posts`);
+}
+```
+
+## Production Setup
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  redis_data:
+```
+
+### Environment Variables
+
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_secure_password
+REDIS_TTL=300
+```
+
+## কখন Redis ব্যবহার করবেন না?
+
+1. **Small applications** - Over-engineering করবেন না
+2. **Frequently changing data** - Cache benefit কম পাবেন
+3. **Complex queries** - Cache invalidation difficult
+4. **Critical data only** - Always need DB as backup
+
+## সুবিধা vs অসুবিধা
+
+### সুবিধা
+- ⚡ Super fast - microseconds response
+- 📉 Reduced database load
+- 🚀 Better scalability
+- 💰 Cost savings (fewer DB resources)
+- 🎯 Multiple use cases (cache, sessions, queues)
+
+### অসুবিধা
+- 💾 RAM expensive (compared to disk)
+- 🔄 Data volatility (RAM based)
+- 🧩 Complexity increase
+- 🐛 Cache invalidation tricky
+- 📊 Extra monitoring needed
+
+## Monitoring & Debugging
+
+```typescript
+// redis-health.service.ts
+@Injectable()
+export class RedisHealthService {
+  constructor(@InjectRedis() private redis: Redis) {}
+
+  async getHealth() {
+    try {
+      const info = await this.redis.info();
+      const dbSize = await this.redis.dbsize();
+      const memory = await this.redis.info('memory');
+      
+      return {
+        status: 'healthy',
+        dbSize,
+        memory: this.parseMemoryInfo(memory),
+        uptime: this.parseUptime(info),
+      };
+    } catch (error) {
+      return {
+        status: 'unhealthy',
+        error: error.message,
+      };
+    }
+  }
+}
+```
+
+## শেষ কথা
+
+Redis হলো modern web applications এর একটা essential component। Proper ভাবে implement করলে আপনার application এর performance dramatically improve হবে। তবে মনে রাখবেন:
+
+> "There are only two hard things in Computer Science: cache invalidation and naming things." - Phil Karlton
+
+Cache strategy ভালোভাবে plan করুন, monitoring setup করুন, এবং always database কে source of truth হিসেবে রাখুন।
+
+Happy caching! 🚀

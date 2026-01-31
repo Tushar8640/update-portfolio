@@ -38,10 +38,10 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap gap-4 pt-4">
-          <Button asChild size="lg" className="rounded-full px-8 text-base shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1">
+          <Button asChild size="lg" className="rounded-full px-8 text-base transition-all hover:-translate-y-0.5">
             <Link href="/projects">View Projects</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="rounded-full px-8 text-base bg-background/50 backdrop-blur border-primary/20 hover:bg-accent/50 hover:border-primary/50 transition-all hover:-translate-y-1">
+          <Button asChild variant="outline" size="lg" className="rounded-full px-8 text-base bg-background/50 backdrop-blur transition-all hover:-translate-y-0.5">
             <Link href="/contact">Get in Touch</Link>
           </Button>
         </div>
