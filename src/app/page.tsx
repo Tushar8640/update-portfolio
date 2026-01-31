@@ -47,7 +47,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="space-y-8">
+      {/* Projects section - hidden for now */}
+      {/* <section className="space-y-8">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">
              <span className="relative z-10">Featured Projects</span>
@@ -94,7 +95,7 @@ export default function Home() {
             </SpotlightCard>
           ))}
         </div>
-      </section>
+      </section> */}
 
       <section className="space-y-8">
         <div className="flex items-center justify-between">
@@ -105,60 +106,96 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6">
-          {/* Fiverr Experience */}
+          {/* StarConnect Experience */}
           <SpotlightCard className="p-6 group relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10 space-y-4">
               <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                 <div>
                   <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
-                    Freelance Full-Stack Developer
+                    Software Engineer (Frontend)
                   </h3>
-                  <p className="text-lg text-muted-foreground mt-1">Fiverr</p>
+                  <p className="text-lg text-muted-foreground mt-1">StarConnect, Dhaka</p>
                 </div>
                 <p className="text-sm text-muted-foreground shrink-0">
-                  2022 - Present
+                  July 2025 - Present
                 </p>
               </div>
-              <p className="text-muted-foreground leading-relaxed">
-                Building production-ready web applications for international clients. Specializing in Next.js, React, NestJS, and PostgreSQL. 
-                Delivered 50+ projects with consistent 5-star ratings.
-              </p>
+              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+                <li>Built and optimized features using Next.js, React, TypeScript, and ShadCN UI</li>
+                <li>Integrated real-time communication, scheduling, and expert-user interaction systems</li>
+                <li>Collaborated with cross-functional teams on scalable, user-centric solutions</li>
+                <li>Participated in architectural decisions for continuous product improvements</li>
+              </ul>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="bg-primary/5 border-primary/10">Next.js</Badge>
                 <Badge variant="outline" className="bg-primary/5 border-primary/10">React</Badge>
                 <Badge variant="outline" className="bg-primary/5 border-primary/10">TypeScript</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">NestJS</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">PostgreSQL</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Prisma</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">ShadCN UI</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Real-time Communication</Badge>
               </div>
             </div>
           </SpotlightCard>
 
-          {/* Previous Experience - Add more as needed */}
+          {/* IdeaChord Experience */}
           <SpotlightCard className="p-6 group relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10 space-y-4">
               <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                 <div>
                   <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
-                    Frontend Developer
+                    Full Stack Developer
                   </h3>
-                  <p className="text-lg text-muted-foreground mt-1">Various Projects</p>
+                  <p className="text-lg text-muted-foreground mt-1">IdeaChord Inc, Dhaka</p>
                 </div>
                 <p className="text-sm text-muted-foreground shrink-0">
-                  2020 - 2022
+                  July 2023 - July 2025
                 </p>
               </div>
-              <p className="text-muted-foreground leading-relaxed">
-                Developed responsive web applications and UI components. Focused on modern React patterns, 
-                state management with Redux, and building pixel-perfect interfaces from Figma designs.
-              </p>
+              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+                <li>Designed and developed company website using HTML, JavaScript, and Firebase</li>
+                <li>Created e-commerce site and dashboard with Next.js and Supabase</li>
+                <li>Built micro-SaaS projects with Next.js, Express, MongoDB, and PostgreSQL</li>
+                <li>Implemented JWT authentication and REST APIs with Prisma ORM</li>
+              </ul>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Next.js</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Express</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">MongoDB</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">PostgreSQL</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Prisma</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Supabase</Badge>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* Zivaka Experience */}
+          <SpotlightCard className="p-6 group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                    Web Developer
+                  </h3>
+                  <p className="text-lg text-muted-foreground mt-1">Zivaka LLP, Kolkata, India</p>
+                </div>
+                <p className="text-sm text-muted-foreground shrink-0">
+                  Jan 2022 - Aug 2022
+                </p>
+              </div>
+              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+                <li>Designed front-end interfaces with React, Bootstrap, and Material UI</li>
+                <li>Integrated RESTful APIs for seamless data communication</li>
+                <li>Developed backend REST APIs using Node.js, Express, and MongoDB</li>
+              </ul>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="bg-primary/5 border-primary/10">React</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Redux</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Tailwind CSS</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Figma</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Node.js</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Express</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">MongoDB</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Bootstrap</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Material UI</Badge>
               </div>
             </div>
           </SpotlightCard>
