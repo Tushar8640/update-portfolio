@@ -13,7 +13,7 @@ export default function Home() {
 
   return (
     <div className="space-y-24">
-      <section className="space-y-8 pt-10 md:pt-20">
+      <section className="space-y-8 pt-4 md:pt-8">
         <div className="space-y-6">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
             <span className="gradient-text pb-2 inline-block">
