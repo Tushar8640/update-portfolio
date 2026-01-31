@@ -1,0 +1,316 @@
+---
+title: "Git Workflow Best Practices for Professional Teams"
+date: "2026-01-26"
+description: "Master Git with proven workflows, commit conventions, and strategies used by top development teams."
+tags: ["git", "workflow", "teamwork", "best-practices"]
+published: true
+---
+
+Git is more than version control - it's communication. Your commit history tells a story. Let's make it a good one.
+
+## The Golden Rules
+
+1. **Commit early, commit often** - Small, focused commits
+2. **Write meaningful messages** - Future you will thank you
+3. **Never commit to main directly** - Use branches
+4. **Review before pushing** - Check your changes
+5. **Pull before you push** - Stay synchronized
+
+## Branch Naming Convention
+
+```bash
+# Feature branches
+feature/user-authentication
+feature/payment-integration
+
+# Bug fixes
+fix/login-redirect-issue
+fix/memory-leak-dashboard
+
+# Hotfixes
+hotfix/critical-security-patch
+
+# Refactoring
+refactor/database-queries
+refactor/component-structure
+
+# Chores (maintenance)
+chore/update-dependencies
+chore/configure-ci
+
+# Documentation
+docs/api-endpoints
+docs/setup-guide
+```
+
+## Commit Message Format
+
+Use **Conventional Commits**:
+
+```bash
+# Format
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+
+# Examples
+feat(auth): add Google OAuth integration
+
+Implemented OAuth 2.0 flow for Google sign-in.
+Users can now authenticate using their Google accounts.
+
+Closes #123
+
+fix(dashboard): resolve memory leak in chart component
+
+The chart component was not properly cleaning up event listeners,
+causing memory to accumulate on route changes.
+
+- Added cleanup in useEffect return
+- Removed unused Chart.js instance
+
+Fixes #456
+
+perf(api): optimize database queries
+
+Reduced query time by 60% by adding proper indexes
+and implementing query batching.
+
+- Added index on user_id column
+- Implemented batch loading for related data
+- Reduced N+1 queries
+
+refactor(components): extract reusable Button component
+
+chore(deps): update Next.js to v15
+
+docs(readme): add deployment instructions
+```
+
+## Commit Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat(auth): add 2FA` |
+| `fix` | Bug fix | `fix(api): handle null users` |
+| `docs` | Documentation | `docs(readme): update setup` |
+| `style` | Formatting | `style: fix indentation` |
+| `refactor` | Code restructure | `refactor: simplify logic` |
+| `perf` | Performance | `perf(db): add indexes` |
+| `test` | Tests | `test(auth): add unit tests` |
+| `chore` | Maintenance | `chore: update deps` |
+
+## Feature Branch Workflow
+
+```bash
+# 1. Update main
+git checkout main
+git pull origin main
+
+# 2. Create feature branch
+git checkout -b feature/new-dashboard
+
+# 3. Make changes and commit
+git add src/components/Dashboard.tsx
+git commit -m "feat(dashboard): create Dashboard component"
+
+# 4. Push to remote
+git push origin feature/new-dashboard
+
+# 5. Create Pull Request on GitHub/GitLab
+
+# 6. After review and approval, merge via PR
+# 7. Delete branch after merging
+git checkout main
+git pull origin main
+git branch -d feature/new-dashboard
+```
+
+## Handling Merge Conflicts
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# If conflicts occur
+# <<<<<<< HEAD
+# Your changes
+# =======
+# Their changes
+# >>>>>>> branch-name
+
+# 1. Open conflicted files
+# 2. Resolve conflicts manually
+# 3. Remove conflict markers
+# 4. Test your changes
+
+# Stage resolved files
+git add .
+
+# Complete the merge
+git commit -m "merge: resolve conflicts with main"
+```
+
+## Interactive Rebase
+
+Clean up your commit history:
+
+```bash
+# Rebase last 3 commits
+git rebase -i HEAD~3
+
+# In editor, you'll see:
+# pick abc123 feat: add feature A
+# pick def456 fix: typo
+# pick ghi789 feat: add feature B
+
+# Change to:
+# pick abc123 feat: add feature A
+# fixup def456 fix: typo
+# pick ghi789 feat: add feature B
+
+# Save and exit - commits will be combined
+```
+
+## Git Hooks with Husky
+
+Automate checks before commits:
+
+```bash
+npm install --save-dev husky lint-staged
+
+# package.json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
+```
+
+## Useful Git Commands
+
+```bash
+# View commit history
+git log --oneline --graph --all
+
+# Undo last commit (keep changes)
+git reset --soft HEAD~1
+
+# Undo last commit (discard changes)
+git reset --hard HEAD~1
+
+# Stash changes
+git stash
+git stash pop
+
+# Cherry-pick specific commit
+git cherry-pick <commit-hash>
+
+# View changes in staging
+git diff --staged
+
+# Amend last commit
+git commit --amend
+
+# Show who changed each line
+git blame <file>
+
+# Search commits
+git log --grep="bug fix"
+
+# Find which commit introduced a bug
+git bisect start
+git bisect bad # Current version is bad
+git bisect good <commit-hash> # This version was good
+```
+
+## Pull Request Best Practices
+
+**Good PR:**
+- Small and focused (< 400 lines)
+- Has descriptive title
+- Includes description of changes
+- Links to relevant issues
+- Passes all CI checks
+- Has screenshots for UI changes
+- Requests specific reviewers
+
+**PR Template:**
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+How to test these changes
+
+## Screenshots
+(if applicable)
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-reviewed code
+- [ ] Commented hard-to-understand areas
+- [ ] Updated documentation
+- [ ] No new warnings
+- [ ] Added tests
+- [ ] All tests pass
+```
+
+## Common Mistakes to Avoid
+
+**❌ Don't:**
+- Commit sensitive data (API keys, passwords)
+- Make huge commits mixing multiple changes
+- Use vague messages like "fix stuff" or "wip"
+- Commit commented-out code
+- Push directly to main/master
+- Rewrite public history
+
+**✅ Do:**
+- Use .gitignore properly
+- Make atomic commits (one logical change)
+- Write descriptive messages
+- Remove dead code
+- Use feature branches
+- Communicate with your team
+
+## Team Workflow Strategy
+
+### GitFlow
+For projects with scheduled releases:
+- `main` - Production
+- `develop` - Integration
+- `feature/*` - New features
+- `release/*` - Release preparation
+- `hotfix/*` - Emergency fixes
+
+### Trunk-Based Development
+For continuous deployment:
+- Everyone commits to `main`
+- Short-lived feature branches (< 2 days)
+- Feature flags for incomplete work
+- Automated testing and deployment
+
+## Conclusion
+
+Good Git practices are a team sport. Consistency matters more than perfection. Pick a workflow, document it, and stick to it.
+
+**Remember:** Your commit history is a form of documentation. Make it count.

@@ -1,0 +1,419 @@
+---
+title: "RabbitMQ কি এবং কেন ব্যবহার করবেন? NestJS দিয়ে বাস্তব উদাহরণ"
+date: "2026-01-31"
+description: "RabbitMQ message queue কিভাবে আপনার application এর scalability এবং reliability বাড়ায়, কখন ব্যবহার করবেন এবং NestJS দিয়ে implementation দেখুন।"
+tags: ["bangla", "rabbitmq", "nestjs", "microservices", "message-queue", "backend"]
+published: true
+---
+
+# RabbitMQ কি এবং কেন ব্যবহার করবেন?
+
+আপনার application যখন বড় হতে থাকে, তখন একটা সমস্যা প্রায়ই দেখা যায় - **synchronous operations** যা slow, unreliable হয়ে যায়। RabbitMQ এই সমস্যার elegant সমাধান।
+
+## RabbitMQ কি?
+
+RabbitMQ হলো একটি **message broker** বা **message queue system**। সহজ ভাষায়, এটি দুইটি application বা service এর মধ্যে message pass করার একটি middleman।
+
+**Real-life উদাহরণ:**  
+ধরুন আপনি একটা restaurant এ order দিলেন। Waiter আপনার order নিয়ে kitchen এ দিয়ে আসলো। আপনাকে kitchen এ দাঁড়িয়ে wait করতে হলো না। Kitchen যখন ready হবে তখন serve করবে। এখানে waiter হলো message broker (RabbitMQ)।
+
+## কেন RabbitMQ ব্যবহার করবেন?
+
+### 1. **Asynchronous Processing**
+Heavy operations যা time নেয়, সেগুলো background এ পাঠিয়ে দিন। User instantly response পাবে।
+
+### 2. **Decoupling Services**
+Service গুলো independent থাকবে। একটা down হলে অন্যটা affected হবে না।
+
+### 3. **Load Balancing**
+Multiple workers একই queue থেকে message নিয়ে process করবে। Traffic বেশি হলে workers বাড়িয়ে দিন।
+
+### 4. **Reliability**
+Message lost হবে না। Service crash করলেও message queue তে safe থাকবে।
+
+## কখন ব্যবহার করবেন?
+
+### Problem 1: Email/SMS পাঠানো Slow করে দিচ্ছে
+
+```typescript
+// ❌ সমস্যা: User registration slow
+async register(data: RegisterDto) {
+  const user = await this.userRepo.save(data);
+  
+  // এই দুইটা synchronous operation time নিচ্ছে
+  await this.emailService.sendWelcomeEmail(user.email); // 2-3 sec
+  await this.smsService.sendOTP(user.phone);            // 1-2 sec
+  
+  return user; // User 4-5 sec wait করছে!
+}
+```
+
+### Problem 2: Image/Video Processing
+
+```typescript
+// ❌ API timeout হয়ে যাচ্ছে
+async uploadVideo(file: Express.Multer.File) {
+  const uploaded = await this.s3.upload(file);
+  
+  // Video compress/transcode করতে 5-10 minutes!
+  await this.videoService.processVideo(uploaded.url);
+  
+  return { message: 'Uploaded' }; // User এতক্ষণ wait করবে?
+}
+```
+
+### Problem 3: Microservices Communication
+
+Order service কে payment service এর response এর জন্য wait করতে হচ্ছে। Network issue হলে fail হয়ে যাচ্ছে।
+
+## RabbitMQ দিয়ে সমাধান
+
+### Architecture বুঝি
+
+```
+Producer (API) → RabbitMQ Queue → Consumer (Worker)
+     ↓                                    ↓
+  Instant Response              Background Processing
+```
+
+## NestJS দিয়ে Implementation
+
+### Step 1: Setup করি
+
+```bash
+npm install @nestjs/microservices amqplib amqp-connection-manager
+```
+
+### Step 2: RabbitMQ Configuration
+
+```typescript
+// rabbitmq.config.ts
+export const RABBITMQ_CONFIG = {
+  urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
+  queue: 'notifications_queue',
+  queueOptions: {
+    durable: true, // Server restart হলেও message থাকবে
+  },
+};
+```
+
+### Step 3: Producer বানাই (যে message পাঠাবে)
+
+```typescript
+// user.service.ts
+import { Injectable } from '@nestjs/common';
+import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { RABBITMQ_CONFIG } from './rabbitmq.config';
+
+@Injectable()
+export class UserService {
+  private client: ClientProxy;
+
+  constructor() {
+    this.client = ClientProxyFactory.create({
+      transport: Transport.RMQ,
+      options: {
+        urls: RABBITMQ_CONFIG.urls,
+        queue: RABBITMQ_CONFIG.queue,
+        queueOptions: RABBITMQ_CONFIG.queueOptions,
+      },
+    });
+  }
+
+  async register(data: RegisterDto) {
+    // User save করি - fast!
+    const user = await this.userRepo.save(data);
+
+    // Message queue তে পাঠিয়ে দিলাম - instant!
+    this.client.emit('user.registered', {
+      email: user.email,
+      name: user.name,
+    });
+
+    // User instantly response পেয়ে গেলো
+    return { message: 'Registration successful', userId: user.id };
+  }
+}
+```
+
+### Step 4: Consumer বানাই (যে message process করবে)
+
+```typescript
+// notification.consumer.ts
+import { Controller } from '@nestjs/common';
+import { EventPattern, Payload } from '@nestjs/microservices';
+import { EmailService } from './email.service';
+
+@Controller()
+export class NotificationConsumer {
+  constructor(private emailService: EmailService) {}
+
+  @EventPattern('user.registered')
+  async handleUserRegistered(@Payload() data: any) {
+    console.log('Processing user registration:', data);
+
+    // Background এ email পাঠাচ্ছি
+    await this.emailService.sendWelcomeEmail(data.email, data.name);
+    
+    console.log('Welcome email sent successfully');
+  }
+}
+```
+
+### Step 5: Consumer App Bootstrap করি
+
+```typescript
+// main.ts (আলাদা consumer service হিসেবে run করতে পারেন)
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AppModule } from './app.module';
+import { RABBITMQ_CONFIG } from './rabbitmq.config';
+
+async function bootstrap() {
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.RMQ,
+      options: {
+        urls: RABBITMQ_CONFIG.urls,
+        queue: RABBITMQ_CONFIG.queue,
+        queueOptions: RABBITMQ_CONFIG.queueOptions,
+        // Multiple workers run করলে auto load balance হবে
+        prefetchCount: 1,
+      },
+    },
+  );
+
+  await app.listen();
+  console.log('RabbitMQ Consumer is listening...');
+}
+
+bootstrap();
+```
+
+## Real-world Example: E-commerce Order Processing
+
+```typescript
+// order.service.ts (Producer)
+@Injectable()
+export class OrderService {
+  constructor(
+    private client: ClientProxy,
+    private orderRepo: OrderRepository,
+  ) {}
+
+  async createOrder(data: CreateOrderDto) {
+    // 1. Order save করি (fast - 100ms)
+    const order = await this.orderRepo.save({
+      ...data,
+      status: 'PENDING',
+    });
+
+    // 2. Queue তে tasks পাঠাই (instant)
+    this.client.emit('order.created', {
+      orderId: order.id,
+      userId: data.userId,
+      items: data.items,
+      total: data.total,
+    });
+
+    // User instantly order confirmation পাবে
+    return { orderId: order.id, status: 'Processing' };
+  }
+}
+
+// order.consumer.ts (Consumer)
+@Controller()
+export class OrderConsumer {
+  @EventPattern('order.created')
+  async handleOrderCreated(@Payload() data: any) {
+    // এখন slow operations background এ
+    
+    // 1. Payment process করি
+    const payment = await this.paymentService.charge(data.total);
+    
+    // 2. Inventory update করি
+    await this.inventoryService.reduceStock(data.items);
+    
+    // 3. Invoice generate করি
+    const invoice = await this.invoiceService.create(data.orderId);
+    
+    // 4. Email পাঠাই
+    await this.emailService.sendOrderConfirmation(data.userId, invoice);
+    
+    // 5. SMS পাঠাই
+    await this.smsService.sendOrderNotification(data.userId);
+    
+    console.log(`Order ${data.orderId} processed successfully`);
+  }
+}
+```
+
+## Advanced Pattern: Request-Reply
+
+কিছু ক্ষেত্রে response চাই। তখন `send()` ব্যবহার করবো (emit() নয়):
+
+```typescript
+// Producer
+async getProcessedData(userId: string) {
+  // Message পাঠালাম এবং response এর জন্য wait করলাম
+  const result = await this.client
+    .send('process.user.data', { userId })
+    .toPromise();
+    
+  return result;
+}
+
+// Consumer
+@MessagePattern('process.user.data')
+async processUserData(@Payload() data: any) {
+  const processed = await this.heavyProcessing(data.userId);
+  return { success: true, data: processed }; // Response return করছি
+}
+```
+
+## Error Handling & Retry
+
+```typescript
+@EventPattern('user.registered')
+async handleUserRegistered(@Payload() data: any, @Ctx() context: RmqContext) {
+  try {
+    await this.emailService.sendWelcomeEmail(data.email);
+    
+    // Success হলে acknowledge করি
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+    channel.ack(originalMsg);
+    
+  } catch (error) {
+    console.error('Failed to send email:', error);
+    
+    // Failed হলে reject করি - message retry হবে
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+    channel.nack(originalMsg, false, true); // requeue = true
+  }
+}
+```
+
+## Dead Letter Queue (DLQ)
+
+বারবার fail হচ্ছে? DLQ তে পাঠিয়ে দিন:
+
+```typescript
+export const RABBITMQ_CONFIG = {
+  urls: ['amqp://localhost:5672'],
+  queue: 'notifications_queue',
+  queueOptions: {
+    durable: true,
+    arguments: {
+      'x-dead-letter-exchange': 'dlx',
+      'x-dead-letter-routing-key': 'failed_notifications',
+      'x-message-ttl': 60000, // 1 minute retry
+    },
+  },
+};
+```
+
+## Multiple Queues পরিচালনা
+
+```typescript
+// app.module.ts
+@Module({
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'EMAIL_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'email_queue',
+        },
+      },
+      {
+        name: 'SMS_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'sms_queue',
+        },
+      },
+    ]),
+  ],
+})
+export class AppModule {}
+
+// Service এ inject করি
+constructor(
+  @Inject('EMAIL_SERVICE') private emailClient: ClientProxy,
+  @Inject('SMS_SERVICE') private smsClient: ClientProxy,
+) {}
+```
+
+## Performance Tips
+
+### 1. Prefetch Count সঠিক রাখুন
+```typescript
+options: {
+  prefetchCount: 10, // একসাথে 10টা message নিবে
+}
+```
+
+### 2. Connection Pooling
+```typescript
+import { connect } from 'amqp-connection-manager';
+
+const connection = connect(['amqp://localhost:5672'], {
+  heartbeatIntervalInSeconds: 30,
+  reconnectTimeInSeconds: 5,
+});
+```
+
+### 3. Message Priority
+```typescript
+this.client.emit('high.priority.task', data, {
+  priority: 10, // 0-10, higher = more priority
+});
+```
+
+## কখন RabbitMQ ব্যবহার করবেন না?
+
+1. **Simple CRUD apps** - Over-engineering করবেন না
+2. **Real-time requirements** - WebSocket বেটার (chat apps)
+3. **Small traffic** - এত complexity লাগবে না
+4. **Strong consistency needed** - Direct database transaction ভালো
+
+## সুবিধা vs অসুবিধা
+
+### সুবিধা
+- ⚡ Fast API responses
+- 📈 Scalable (workers বাড়ান)
+- 🔄 Reliable (message lost হয় না)
+- 🔌 Decoupled services
+- 🛡️ Fault tolerant
+
+### অসুবিধা
+- 🏗️ Extra infrastructure (RabbitMQ server চালাতে হবে)
+- 🧠 Learning curve আছে
+- 🐛 Debugging complex হয় (distributed system)
+- 💰 Cost বাড়ে (server, maintenance)
+
+## Production Checklist
+
+- ✅ RabbitMQ cluster setup করুন (high availability)
+- ✅ Monitoring setup করুন (RabbitMQ Management UI)
+- ✅ Dead Letter Queue configure করুন
+- ✅ Message persistence enable করুন
+- ✅ Connection retry logic add করুন
+- ✅ Proper error logging করুন
+- ✅ Load testing করুন
+
+## শেষ কথা
+
+RabbitMQ একটা powerful tool যা সঠিক ক্ষেত্রে ব্যবহার করলে application এর performance এবং reliability অনেক বাড়ায়। তবে মনে রাখবেন:
+
+> "Use it when you need it, not because it's cool."
+
+আপনার application এর requirements বুঝুন, তারপর decide করুন RabbitMQ লাগবে কিনা। শুরুতে simple রাখুন, scale করার দরকার পড়লে তখন add করুন।
+
+Happy coding! 🚀

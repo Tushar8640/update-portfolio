@@ -1,0 +1,287 @@
+---
+title: "Clean Code Principles for JavaScript Developers"
+date: "2026-01-27"
+description: "Write maintainable, readable JavaScript code that your future self (and teammates) will thank you for."
+tags: ["javascript", "clean-code", "best-practices", "programming"]
+published: true
+---
+
+Writing code is easy. Writing code that others (including future you) can understand and maintain is hard. Let's change that.
+
+## Why Clean Code Matters
+
+**Bad code compounds.** What starts as "I'll fix it later" becomes technical debt that slows down your entire team. Clean code is an investment that pays dividends.
+
+## 1. Meaningful Names
+
+Names should reveal intent:
+
+```js
+// ❌ Cryptic
+const d = new Date();
+const u = users.filter(u => u.a);
+
+// ✅ Clear
+const currentDate = new Date();
+const activeUsers = users.filter(user => user.isActive);
+```
+
+**Rules:**
+- Use searchable names
+- Avoid mental mapping (i, j, k for non-loops)
+- One word per concept (don't mix get/fetch/retrieve)
+
+## 2. Functions Should Do One Thing
+
+```js
+// ❌ Doing too much
+function saveUserAndSendEmail(userData) {
+  const user = db.users.create(userData);
+  const emailBody = generateEmailBody(user);
+  sendEmail(user.email, emailBody);
+  logActivity('user_created', user.id);
+  updateAnalytics('new_user');
+  return user;
+}
+
+// ✅ Single responsibility
+function createUser(userData) {
+  return db.users.create(userData);
+}
+
+function notifyNewUser(user) {
+  const emailBody = generateWelcomeEmail(user);
+  sendEmail(user.email, emailBody);
+}
+```
+
+## 3. Keep Functions Small
+
+**Rule of thumb:** If you need to scroll, it's too long.
+
+```js
+// ✅ Small, focused functions
+function validateUserInput(data) {
+  if (!data.email) throw new Error('Email required');
+  if (!isValidEmail(data.email)) throw new Error('Invalid email');
+  if (data.password.length < 8) throw new Error('Password too short');
+}
+
+function createUser(data) {
+  validateUserInput(data);
+  const hashedPassword = hashPassword(data.password);
+  return db.users.create({ ...data, password: hashedPassword });
+}
+```
+
+## 4. Avoid Boolean Parameters
+
+Boolean flags indicate a function does multiple things:
+
+```js
+// ❌ Confusing
+function createUser(userData, sendEmail) {
+  const user = db.users.create(userData);
+  if (sendEmail) {
+    sendWelcomeEmail(user);
+  }
+  return user;
+}
+
+// ✅ Clear intent
+function createUser(userData) {
+  return db.users.create(userData);
+}
+
+function createUserWithWelcomeEmail(userData) {
+  const user = createUser(userData);
+  sendWelcomeEmail(user);
+  return user;
+}
+```
+
+## 5. Use Object Destructuring
+
+Make parameter expectations clear:
+
+```js
+// ❌ Position-dependent
+function createPost(title, content, author, tags, published) {
+  // ...
+}
+createPost('Title', 'Content', 'John', ['js'], true);
+
+// ✅ Self-documenting
+function createPost({ title, content, author, tags = [], published = false }) {
+  // ...
+}
+createPost({
+  title: 'Title',
+  content: 'Content',
+  author: 'John',
+  tags: ['js'],
+  published: true
+});
+```
+
+## 6. Early Returns
+
+Reduce nesting with guard clauses:
+
+```js
+// ❌ Deep nesting
+function processUser(user) {
+  if (user) {
+    if (user.isActive) {
+      if (user.hasPermission) {
+        // do something
+      }
+    }
+  }
+}
+
+// ✅ Early returns
+function processUser(user) {
+  if (!user) return;
+  if (!user.isActive) return;
+  if (!user.hasPermission) return;
+  
+  // do something
+}
+```
+
+## 7. Avoid Magic Numbers
+
+```js
+// ❌ What does 86400000 mean?
+setTimeout(cleanup, 86400000);
+
+// ✅ Clear and maintainable
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+setTimeout(cleanup, ONE_DAY_IN_MS);
+```
+
+## 8. Don't Comment Bad Code, Rewrite It
+
+```js
+// ❌ Comment explaining bad code
+// Check if user is active and has permission
+if (u.a && u.p) {
+  // ...
+}
+
+// ✅ Self-explanatory code
+const canAccess = user.isActive && user.hasPermission;
+if (canAccess) {
+  // ...
+}
+```
+
+## 9. Error Handling
+
+Handle errors properly:
+
+```js
+// ❌ Silent failure
+function getUser(id) {
+  try {
+    return db.users.find(id);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ✅ Proper error handling
+async function getUser(id) {
+  try {
+    return await db.users.find(id);
+  } catch (error) {
+    logger.error('Failed to fetch user', { id, error });
+    throw new DatabaseError(`Could not find user ${id}`);
+  }
+}
+```
+
+## 10. Use Modern JavaScript Features
+
+```js
+// ❌ Old style
+var result = [];
+for (var i = 0; i < items.length; i++) {
+  if (items[i].active) {
+    result.push(items[i].name);
+  }
+}
+
+// ✅ Modern and readable
+const result = items
+  .filter(item => item.active)
+  .map(item => item.name);
+```
+
+## 11. Consistent Code Style
+
+Use a linter and formatter:
+
+```json
+// .eslintrc.json
+{
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "no-console": "warn",
+    "no-unused-vars": "error"
+  }
+}
+```
+
+```json
+// .prettierrc
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5"
+}
+```
+
+## 12. Pure Functions When Possible
+
+```js
+// ❌ Impure (side effects)
+let total = 0;
+function addToTotal(amount) {
+  total += amount;
+  return total;
+}
+
+// ✅ Pure (predictable)
+function add(a, b) {
+  return a + b;
+}
+```
+
+## The Boy Scout Rule
+
+**"Leave the code cleaner than you found it."**
+
+Even small improvements add up:
+- Rename a confusing variable
+- Extract a complex condition
+- Add a missing type annotation
+- Remove unused code
+
+## Recommended Tools
+
+1. **ESLint** - Catch bugs and enforce rules
+2. **Prettier** - Consistent formatting
+3. **TypeScript** - Type safety
+4. **SonarQube** - Code quality metrics
+5. **Husky** - Pre-commit hooks
+
+## Conclusion
+
+Clean code isn't about perfection - it's about clarity. Every time you write code, ask yourself: **"Will someone else understand this in 6 months?"**
+
+If the answer is no, refactor it.
+
+**Remember:** Code is read far more often than it's written. Optimize for readability.

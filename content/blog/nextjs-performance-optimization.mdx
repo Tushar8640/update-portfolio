@@ -1,0 +1,251 @@
+---
+title: "Next.js Performance Optimization: From Good to Great"
+date: "2026-01-30"
+description: "Proven techniques to make your Next.js app blazingly fast with real-world examples and benchmarks."
+tags: ["nextjs", "performance", "optimization", "react"]
+published: true
+---
+
+Performance isn't just about milliseconds - it's about user experience, SEO rankings, and conversion rates. A 1-second delay can reduce conversions by 7%. Let's make your Next.js app lightning fast.
+
+## The Performance Mindset
+
+Before diving into techniques, understand these principles:
+- **Measure first** - Use tools before and after optimization
+- **User-centric metrics** - Focus on what users feel, not just what DevTools show
+- **Progressive enhancement** - Start with core content, enhance progressively
+
+## 1. Image Optimization
+
+Next.js `<Image>` component is your best friend:
+
+```tsx
+import Image from 'next/image';
+
+// ✅ Optimized
+<Image
+  src="/hero.jpg"
+  alt="Hero"
+  width={1200}
+  height={600}
+  priority // For above-the-fold images
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,..."
+/>
+
+// ❌ Unoptimized
+<img src="/hero.jpg" alt="Hero" />
+```
+
+**Pro tips:**
+- Use `priority` for LCP images
+- Always provide `width` and `height`
+- Use `loading="lazy"` for below-the-fold images
+- Serve WebP/AVIF formats automatically
+
+## 2. Font Optimization
+
+Use Next.js font optimization:
+
+```tsx
+import { Inter, Geist } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+});
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={inter.className}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**Benefits:**
+- Zero layout shift
+- Self-hosted fonts
+- Automatic subsetting
+
+## 3. Code Splitting
+
+Split large dependencies:
+
+```tsx
+// ❌ Loads entire library upfront
+import { HeavyChart } from 'chart-library';
+
+// ✅ Load only when needed
+import dynamic from 'next/dynamic';
+
+const HeavyChart = dynamic(() => import('chart-library').then(mod => mod.HeavyChart), {
+  loading: () => <Skeleton />,
+  ssr: false // Skip SSR if not needed
+});
+```
+
+## 4. Streaming and Suspense
+
+Stream content progressively:
+
+```tsx
+import { Suspense } from 'react';
+
+export default function Page() {
+  return (
+    <div>
+      <Header />
+      <Suspense fallback={<Skeleton />}>
+        <SlowComponent />
+      </Suspense>
+      <Footer />
+    </div>
+  );
+}
+
+async function SlowComponent() {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+```
+
+**Result:** Users see content faster, improved perceived performance.
+
+## 5. Database Optimization
+
+Optimize your queries:
+
+```tsx
+// ❌ N+1 queries
+const users = await prisma.user.findMany();
+for (const user of users) {
+  user.posts = await prisma.post.findMany({ where: { userId: user.id } });
+}
+
+// ✅ Single query with relations
+const users = await prisma.user.findMany({
+  include: {
+    posts: {
+      take: 5,
+      orderBy: { createdAt: 'desc' }
+    }
+  }
+});
+```
+
+## 6. Caching Strategies
+
+Leverage Next.js caching:
+
+```tsx
+// Revalidate every hour
+export const revalidate = 3600;
+
+// Or use on-demand revalidation
+import { revalidatePath } from 'next/cache';
+
+export async function createPost(data: FormData) {
+  await db.post.create({ data });
+  revalidatePath('/blog');
+}
+```
+
+## 7. Route Handlers Optimization
+
+Optimize API routes:
+
+```tsx
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const data = await fetchData();
+  
+  return NextResponse.json(data, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+    }
+  });
+}
+```
+
+## 8. Bundle Analysis
+
+Analyze your bundle:
+
+```bash
+npm install @next/bundle-analyzer
+```
+
+```js
+// next.config.js
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+module.exports = withBundleAnalyzer({
+  // your config
+});
+```
+
+Run: `ANALYZE=true npm run build`
+
+## 9. Parallel Data Fetching
+
+Fetch data in parallel:
+
+```tsx
+// ❌ Sequential (slow)
+const user = await fetchUser();
+const posts = await fetchPosts();
+const comments = await fetchComments();
+
+// ✅ Parallel (fast)
+const [user, posts, comments] = await Promise.all([
+  fetchUser(),
+  fetchPosts(),
+  fetchComments()
+]);
+```
+
+## 10. Lighthouse Score Optimization
+
+Target these metrics:
+
+| Metric | Good | Target |
+|--------|------|--------|
+| LCP | < 2.5s | < 1.5s |
+| FID | < 100ms | < 50ms |
+| CLS | < 0.1 | < 0.05 |
+| FCP | < 1.8s | < 1.0s |
+| TTI | < 3.8s | < 2.5s |
+
+## Monitoring Tools
+
+Use these tools to track performance:
+
+1. **Vercel Analytics** - Real user metrics
+2. **Lighthouse CI** - Automated testing
+3. **Web Vitals** - Track Core Web Vitals
+4. **Sentry** - Performance monitoring
+
+## Quick Wins Checklist
+
+- [ ] Enable Next.js Image optimization
+- [ ] Use font optimization
+- [ ] Add loading states with Suspense
+- [ ] Implement proper caching headers
+- [ ] Bundle analyze and remove unused deps
+- [ ] Optimize database queries
+- [ ] Add proper meta tags for SEO
+- [ ] Use static generation where possible
+- [ ] Implement code splitting
+- [ ] Monitor real user metrics
+
+## Conclusion
+
+Performance optimization is an ongoing process. Start with the low-hanging fruit (images, fonts), measure the impact, then tackle more complex optimizations.
+
+**Remember:** Fast websites make happy users, and happy users convert better.

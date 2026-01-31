@@ -1,0 +1,425 @@
+---
+title: "React Architecture Patterns: Building Scalable Applications"
+date: "2026-01-30"
+description: "Master proven architectural patterns for building maintainable, scalable React applications that teams love to work with."
+tags: ["react", "architecture", "patterns", "advanced"]
+published: true
+---
+
+Building a small React app is easy. Building a large, maintainable React app that scales with your team? That's where architecture matters.
+
+## Why Architecture Matters
+
+**Without good architecture:**
+- Code becomes spaghetti
+- Features take longer to ship
+- Bugs multiply
+- New developers struggle to onboard
+- Refactoring becomes scary
+
+**With good architecture:**
+- Clear structure everyone understands
+- Features ship faster
+- Easier to test and debug
+- Smooth developer onboarding
+- Confident refactoring
+
+## 1. Folder Structure Patterns
+
+### Feature-Based Structure (Recommended)
+
+Organize by features, not by file types:
+
+```
+src/
+├── features/
+│   ├── auth/
+│   │   ├── components/
+│   │   │   ├── LoginForm.tsx
+│   │   │   └── RegisterForm.tsx
+│   │   ├── hooks/
+│   │   │   └── useAuth.ts
+│   │   ├── api/
+│   │   │   └── authApi.ts
+│   │   ├── types/
+│   │   │   └── auth.types.ts
+│   │   └── index.ts
+│   ├── dashboard/
+│   ├── profile/
+│   └── settings/
+├── shared/
+│   ├── components/
+│   │   ├── Button/
+│   │   ├── Input/
+│   │   └── Modal/
+│   ├── hooks/
+│   ├── utils/
+│   └── types/
+├── store/
+├── services/
+└── App.tsx
+```
+
+**Benefits:**
+- Easy to find related code
+- Clear feature boundaries
+- Simple to delete features
+- Better code organization
+
+## 2. Component Architecture Patterns
+
+### Container/Presenter Pattern
+
+Separate logic from presentation:
+
+```tsx
+// Container (Smart Component)
+function UserListContainer() {
+  const { data: users, isLoading } = useQuery('users', fetchUsers);
+  const [filter, setFilter] = useState('');
+
+  const filteredUsers = users?.filter(u => 
+    u.name.includes(filter)
+  );
+
+  if (isLoading) return <Spinner />;
+
+  return (
+    <UserListPresenter 
+      users={filteredUsers}
+      filter={filter}
+      onFilterChange={setFilter}
+    />
+  );
+}
+
+// Presenter (Dumb Component)
+function UserListPresenter({ users, filter, onFilterChange }) {
+  return (
+    <div>
+      <input 
+        value={filter} 
+        onChange={e => onFilterChange(e.target.value)}
+        placeholder="Filter users..."
+      />
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Compound Components Pattern
+
+Create flexible, composable components:
+
+```tsx
+// API
+<Select value={value} onChange={setValue}>
+  <Select.Trigger>
+    <Select.Value placeholder="Select option" />
+  </Select.Trigger>
+  <Select.Content>
+    <Select.Item value="1">Option 1</Select.Item>
+    <Select.Item value="2">Option 2</Select.Item>
+  </Select.Content>
+</Select>
+
+// Implementation
+const SelectContext = createContext();
+
+function Select({ children, value, onChange }) {
+  return (
+    <SelectContext.Provider value={{ value, onChange }}>
+      <div className="select">{children}</div>
+    </SelectContext.Provider>
+  );
+}
+
+Select.Trigger = function Trigger({ children }) {
+  const { value } = useContext(SelectContext);
+  return <button>{children}</button>;
+};
+
+Select.Item = function Item({ value, children }) {
+  const { onChange } = useContext(SelectContext);
+  return (
+    <div onClick={() => onChange(value)}>
+      {children}
+    </div>
+  );
+};
+```
+
+## 3. State Management Architecture
+
+### Layered State Approach
+
+Different types of state need different solutions:
+
+```tsx
+// 1. Local State (useState, useReducer)
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
+}
+
+// 2. Shared UI State (Context)
+const ThemeContext = createContext();
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+// 3. Server State (React Query/SWR)
+function UserProfile() {
+  const { data: user } = useQuery(['user', userId], fetchUser);
+  return <div>{user.name}</div>;
+}
+
+// 4. Global App State (Zustand/Redux)
+const useStore = create((set) => ({
+  cart: [],
+  addToCart: (item) => set((state) => ({ 
+    cart: [...state.cart, item] 
+  }))
+}));
+```
+
+## 4. Custom Hooks Architecture
+
+### Composable Hooks Pattern
+
+Build complex logic from simple hooks:
+
+```tsx
+// Base hooks
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Composed hook
+function useSearch(apiUrl) {
+  const [query, setQuery] = useLocalStorage('searchQuery', '');
+  const debouncedQuery = useDebounce(query, 500);
+  
+  const { data, isLoading } = useQuery(
+    ['search', debouncedQuery],
+    () => fetch(`${apiUrl}?q=${debouncedQuery}`).then(r => r.json()),
+    { enabled: !!debouncedQuery }
+  );
+
+  return { query, setQuery, results: data, isLoading };
+}
+
+// Usage
+function SearchComponent() {
+  const { query, setQuery, results, isLoading } = useSearch('/api/search');
+  
+  return (
+    <div>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
+      {isLoading ? <Spinner /> : <Results data={results} />}
+    </div>
+  );
+}
+```
+
+## 5. Data Fetching Architecture
+
+### API Layer Pattern
+
+Centralize API calls:
+
+```tsx
+// api/client.ts
+const apiClient = {
+  get: (url) => fetch(url).then(r => r.json()),
+  post: (url, data) => fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json())
+};
+
+// api/users.ts
+export const usersApi = {
+  getAll: () => apiClient.get('/api/users'),
+  getById: (id) => apiClient.get(`/api/users/${id}`),
+  create: (data) => apiClient.post('/api/users', data),
+  update: (id, data) => apiClient.post(`/api/users/${id}`, data)
+};
+
+// hooks/useUsers.ts
+export function useUsers() {
+  return useQuery('users', usersApi.getAll);
+}
+
+export function useUser(id) {
+  return useQuery(['user', id], () => usersApi.getById(id));
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation(usersApi.create, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('users');
+    }
+  });
+}
+```
+
+## 6. Error Boundary Pattern
+
+Handle errors gracefully:
+
+```tsx
+class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error caught:', error, errorInfo);
+    // Send to error tracking service
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} />;
+    }
+    return this.props.children;
+  }
+}
+
+// Usage
+<ErrorBoundary>
+  <App />
+</ErrorBoundary>
+```
+
+## 7. Performance Patterns
+
+### Code Splitting by Route
+
+```tsx
+import { lazy, Suspense } from 'react';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Profile = lazy(() => import('./pages/Profile'));
+
+function App() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </Suspense>
+  );
+}
+```
+
+### Memoization Pattern
+
+```tsx
+// Expensive component
+const ExpensiveList = memo(({ items, onItemClick }) => {
+  return items.map(item => (
+    <ExpensiveItem 
+      key={item.id} 
+      item={item} 
+      onClick={onItemClick}
+    />
+  ));
+});
+
+// Parent component
+function Parent() {
+  const [filter, setFilter] = useState('');
+  
+  // Memoize callback
+  const handleClick = useCallback((id) => {
+    console.log('Clicked', id);
+  }, []);
+  
+  // Memoize expensive computation
+  const filteredItems = useMemo(() => 
+    items.filter(item => item.name.includes(filter)),
+    [items, filter]
+  );
+
+  return (
+    <ExpensiveList 
+      items={filteredItems} 
+      onItemClick={handleClick}
+    />
+  );
+}
+```
+
+## Best Practices Checklist
+
+- [ ] Use feature-based folder structure
+- [ ] Separate containers from presenters
+- [ ] Create reusable custom hooks
+- [ ] Implement proper error boundaries
+- [ ] Use React Query for server state
+- [ ] Code split by routes
+- [ ] Memoize expensive operations
+- [ ] Keep components small and focused
+- [ ] Write comprehensive tests
+- [ ] Document complex logic
+
+## Common Pitfalls to Avoid
+
+**❌ Don't:**
+- Put everything in one folder
+- Mix business logic with UI
+- Use Context for frequently changing data
+- Premature optimization
+- Over-engineer simple features
+
+**✅ Do:**
+- Start simple, scale when needed
+- Test as you build
+- Refactor regularly
+- Document architectural decisions
+- Keep it consistent across the codebase
+
+## Conclusion
+
+Good architecture isn't about following every pattern - it's about choosing the right patterns for your specific needs. Start simple, and introduce complexity only when it solves real problems.
+
+**Remember:** The best architecture is the one your team can understand and maintain.
