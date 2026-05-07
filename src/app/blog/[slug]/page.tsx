@@ -52,14 +52,14 @@ export default async function BlogPostPage({
   });
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl">
       <BackButton />
       
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
         {/* Main Content */}
-        <article className="max-w-4xl">
-          <header className="space-y-4 pb-8 border-b border-border mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+        <article className="min-w-0 max-w-4xl">
+          <header className="mb-8 space-y-4 border-b border-border pb-8">
+            <h1 className="text-3xl font-bold leading-tight tracking-tight md:text-5xl">
               {post.meta.title}
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
@@ -78,13 +78,13 @@ export default async function BlogPostPage({
               )}
             </div>
             {post.meta.description && (
-              <p className="text-xl text-muted-foreground leading-relaxed mt-4">
+              <p className="mt-4 text-lg leading-relaxed text-muted-foreground md:text-xl">
                 {post.meta.description}
               </p>
             )}
           </header>
 
-          <div className="prose-custom">
+          <div className="prose-custom min-w-0">
             {compiled.content}
           </div>
         </article>

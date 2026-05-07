@@ -19,10 +19,10 @@ export default function BlogPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
           Blog
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
           Short, practical notes on building and shipping clean features.
         </p>
       </div>

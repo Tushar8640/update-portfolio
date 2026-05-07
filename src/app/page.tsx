@@ -10,18 +10,18 @@ import { siteConfig } from "@/lib/site";
 
 export default function Home() {
   const posts = getAllPosts().slice(0, 2);
-  const featuredProjects = projects.slice(0, 3);
+  const featuredProjects = projects.slice(0, 4);
 
   return (
-    <div className="space-y-24">
-      <section className="space-y-8 pt-4 md:pt-8">
+    <div className="space-y-16 md:space-y-24">
+      <section className="space-y-8 pt-2 md:pt-8">
         <div className="space-y-6">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
             <span className="gradient-text pb-2 inline-block">
               {siteConfig.name}
             </span>
           </h1>
-          <p className="max-w-3xl text-xl text-muted-foreground leading-relaxed md:text-2xl">
+          <p className="max-w-3xl text-lg text-muted-foreground leading-relaxed sm:text-xl md:text-2xl">
             {siteConfig.description}
           </p>
         </div>
@@ -38,14 +38,14 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-4 pt-4">
-          <Button asChild size="lg" className="rounded-full px-8 text-base transition-all hover:-translate-y-0.5">
+        <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:flex-wrap sm:gap-4">
+          <Button asChild size="lg" className="w-full rounded-full px-8 text-base transition-all hover:-translate-y-0.5 sm:w-auto">
             <Link href="/projects">View Projects</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="rounded-full px-8 text-base bg-background/50 backdrop-blur transition-all hover:-translate-y-0.5">
+          <Button asChild variant="outline" size="lg" className="w-full rounded-full bg-background/50 px-8 text-base backdrop-blur transition-all hover:-translate-y-0.5 sm:w-auto">
             <Link href="/contact">Get in Touch</Link>
           </Button>
-          <Button asChild variant="secondary" size="lg" className="rounded-full px-8 text-base transition-all hover:-translate-y-0.5">
+          <Button asChild variant="secondary" size="lg" className="w-full rounded-full px-8 text-base transition-all hover:-translate-y-0.5 sm:w-auto">
             <a href="/resume.pdf" download="Tusar-Imran-Full-stack-developer.pdf">
               <Download className="mr-2 size-4" aria-hidden="true" />
               Download Resume
@@ -55,8 +55,8 @@ export default function Home() {
       </section>
 
       <section className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
             <span className="relative z-10">Experience</span>
             <span className="absolute -left-4 -top-4 -z-10 h-16 w-16 bg-primary/10 rounded-full blur-2xl" />
           </h2>
@@ -64,21 +64,21 @@ export default function Home() {
 
         <div className="grid gap-6">
           {/* StarConnect Experience */}
-          <SpotlightCard className="p-6 group relative overflow-hidden">
+          <SpotlightCard className="group relative overflow-hidden p-4 sm:p-6">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10 space-y-4">
               <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-bold transition-colors group-hover:text-primary sm:text-2xl">
                     Software Engineer (Full Stack)
                   </h3>
-                  <p className="text-lg text-muted-foreground mt-1">StarConnect, Dhaka</p>
+                  <p className="mt-1 text-base text-muted-foreground sm:text-lg">StarConnect, Dhaka</p>
                 </div>
                 <p className="text-sm text-muted-foreground shrink-0">
                   July 2025 - Present
                 </p>
               </div>
-              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+              <ul className="list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
                 <li>Built production-grade platform features with Next.js, React, and TypeScript</li>
                 <li>Achieved about 100% Lighthouse performance score through frontend optimization</li>
                 <li>Delivered real-time chat, video calls, webinars, and scheduling workflows</li>
@@ -97,21 +97,21 @@ export default function Home() {
           </SpotlightCard>
 
           {/* IdeaChord Experience */}
-          <SpotlightCard className="p-6 group relative overflow-hidden">
+          <SpotlightCard className="group relative overflow-hidden p-4 sm:p-6">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10 space-y-4">
               <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-bold transition-colors group-hover:text-primary sm:text-2xl">
                     Full Stack Developer
                   </h3>
-                  <p className="text-lg text-muted-foreground mt-1">IdeaChord Inc, Dhaka</p>
+                  <p className="mt-1 text-base text-muted-foreground sm:text-lg">IdeaChord Inc, Dhaka</p>
                 </div>
                 <p className="text-sm text-muted-foreground shrink-0">
                   July 2023 - July 2025
                 </p>
               </div>
-              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+              <ul className="list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
                 <li>Developed university student management and beneficiary fund management systems with Next.js, NestJS, Prisma, and MySQL</li>
                 <li>Built optimized APIs, role-based authentication, and responsive administrative dashboards</li>
                 <li>Improved database performance and maintainability for operational workflows</li>
@@ -130,21 +130,21 @@ export default function Home() {
           </SpotlightCard>
 
           {/* Zivaka Experience */}
-          <SpotlightCard className="p-6 group relative overflow-hidden">
+          <SpotlightCard className="group relative overflow-hidden p-4 sm:p-6">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10 space-y-4">
               <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-bold transition-colors group-hover:text-primary sm:text-2xl">
                     Web Developer
                   </h3>
-                  <p className="text-lg text-muted-foreground mt-1">Zivaka LLP, Kolkata, India</p>
+                  <p className="mt-1 text-base text-muted-foreground sm:text-lg">Zivaka LLP, Kolkata, India</p>
                 </div>
                 <p className="text-sm text-muted-foreground shrink-0">
                   Jan 2022 - Aug 2022
                 </p>
               </div>
-              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+              <ul className="list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
                 <li>Developed scalable REST APIs with Node.js, Express, MongoDB, and Mongoose</li>
                 <li>Built a real estate business website with React for apartment sales and property listings</li>
                 <li>Created admin dashboard workflows for property updates, client interactions, and business operations</li>
@@ -163,8 +163,8 @@ export default function Home() {
       </section>
 
       <section className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
              <span className="relative z-10">Featured Projects</span>
              <span className="absolute -left-4 -top-4 -z-10 h-16 w-16 bg-primary/10 rounded-full blur-2xl" />
           </h2>
@@ -176,11 +176,11 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           {featuredProjects.map((p) => (
-            <SpotlightCard key={p.slug} className="group flex h-full flex-col p-6">
+            <SpotlightCard key={p.slug} className="group flex h-full flex-col p-4 sm:p-6">
               <div className="flex-1 space-y-4">
-                <h3 className="text-2xl font-bold transition-colors group-hover:text-primary">
+                <h3 className="text-xl font-bold transition-colors group-hover:text-primary sm:text-2xl">
                   {p.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
@@ -194,7 +194,7 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              <div className="mt-8 flex flex-wrap gap-4 text-sm font-medium">
+              <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
                 {p.href && (
                   <a href={p.href} target="_blank" rel="noreferrer" className="flex items-center text-primary transition-opacity hover:opacity-80">
                     Live Demo <span className="sr-only">for {p.title}</span>
@@ -222,8 +222,8 @@ export default function Home() {
       </section>
 
       <section className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">Latest from the Blog</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Latest from the Blog</h2>
           <Button variant="ghost" className="group" asChild>
             <Link href="/blog">
               Read all roles 
@@ -235,7 +235,7 @@ export default function Home() {
         <div className="grid gap-6">
           {posts.map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`}>
-              <SpotlightCard className="p-6 transition-all hover:border-primary/50 relative overflow-hidden group">
+              <SpotlightCard className="group relative overflow-hidden p-4 transition-all hover:border-primary/50 sm:p-6">
                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 <div className="relative z-10 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <h3 className="text-xl font-bold group-hover:text-primary transition-colors">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Clock, TrendingUp, Tag } from "lucide-react";
-import { formatBlogDate, getAllPosts, type BlogPostMeta } from "@/lib/blog";
+import { formatBlogDate, getAllPosts } from "@/lib/blog";
 import { Card } from "./ui/card";
 
 export function BlogSidebar({ currentSlug }: { currentSlug: string }) {

@@ -43,12 +43,12 @@ export function BlogSearch({ posts }: { posts: BlogSearchItem[] }) {
 
       <div className="space-y-5">
         {filtered.map((p) => (
-          <SpotlightCard key={p.slug} className="p-6">
+          <SpotlightCard key={p.slug} className="p-4 sm:p-6">
             <div className="flex flex-col gap-2">
-              <Link href={`/blog/${p.slug}`} className="text-xl font-semibold link-hover">
+              <Link href={`/blog/${p.slug}`} className="text-lg font-semibold link-hover sm:text-xl">
                 {p.title}
               </Link>
-              <p className="text-sm text-muted-foreground font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 {p.date} • {p.readingMinutes} min read
               </p>
             </div>

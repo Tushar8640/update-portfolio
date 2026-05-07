@@ -25,7 +25,7 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
   };
 
   return (
-    <div className="group relative my-6 rounded-lg overflow-hidden border border-[#1e1e1e] shadow-2xl">
+    <div className="group relative my-6 max-w-full overflow-hidden rounded-lg border border-[#1e1e1e] shadow-2xl">
       {/* Header with language badge and copy button */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-[#2d2d2d]">
         <span className="text-xs font-medium text-[#858585] uppercase tracking-wide">
@@ -57,9 +57,9 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
           code={code} 
           language={language}
         >
-          {({ className: highlightClassName, style, tokens, getLineProps, getTokenProps }) => (
+          {({ style, tokens, getLineProps, getTokenProps }) => (
             <pre
-              className="overflow-x-auto p-4 text-[13.5px] leading-[1.6] custom-scrollbar"
+              className="custom-scrollbar max-w-full overflow-x-auto p-3 text-[12.5px] leading-[1.6] sm:p-4 sm:text-[13.5px]"
               style={{ ...style, backgroundColor: "#1e1e1e" }}
             >
               <code>

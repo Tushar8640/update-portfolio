@@ -4,17 +4,17 @@ import { CodeBlock, InlineCode } from "./code-block";
 
 export const mdxComponents: MDXComponents = {
   h1: ({ children }) => (
-    <h1 className="text-4xl font-bold tracking-tight mt-8 mb-4 text-foreground">
+    <h1 className="mt-8 mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-3xl font-bold tracking-tight mt-8 mb-4 text-foreground border-b border-border pb-2">
+    <h2 className="mt-8 mb-4 border-b border-border pb-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-2xl font-semibold tracking-tight mt-6 mb-3 text-foreground">
+    <h3 className="mt-6 mb-3 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
       {children}
     </h3>
   ),
@@ -24,22 +24,22 @@ export const mdxComponents: MDXComponents = {
     </h4>
   ),
   p: ({ children }) => (
-    <p className="text-lg leading-relaxed my-4 text-foreground/90">
+    <p className="my-4 text-base leading-relaxed text-foreground/90 md:text-lg">
       {children}
     </p>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc list-inside space-y-2 my-4 text-lg text-foreground/90">
+    <ul className="my-4 list-disc space-y-2 pl-5 text-base text-foreground/90 md:text-lg">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-inside space-y-2 my-4 text-lg text-foreground/90">
+    <ol className="my-4 list-decimal space-y-2 pl-5 text-base text-foreground/90 md:text-lg">
       {children}
     </ol>
   ),
   li: ({ children }) => (
-    <li className="ml-4">{children}</li>
+    <li className="leading-relaxed">{children}</li>
   ),
   blockquote: ({ children }) => (
     <blockquote className="border-l-4 border-primary pl-4 py-2 my-4 italic text-muted-foreground bg-muted/30 rounded-r">
@@ -79,7 +79,7 @@ export const mdxComponents: MDXComponents = {
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="text-primary hover:text-primary/80 underline underline-offset-4 font-medium transition-colors"
+          className="break-words text-primary underline underline-offset-4 font-medium transition-colors hover:text-primary/80"
         >
           {children}
         </a>
@@ -87,7 +87,7 @@ export const mdxComponents: MDXComponents = {
     }
 
     return (
-      <Link href={href} className="text-primary hover:text-primary/80 underline underline-offset-4 font-medium transition-colors">
+      <Link href={href} className="break-words text-primary underline underline-offset-4 font-medium transition-colors hover:text-primary/80">
         {children}
       </Link>
     );

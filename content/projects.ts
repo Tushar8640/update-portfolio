@@ -57,4 +57,18 @@ export const projects: Project[] = [
       "Built backend APIs with Node.js, MongoDB, JWT authentication, and Redux-powered frontend state",
     ],
   },
+  {
+    slug: "expense-tracker",
+    title: "Expense Tracker",
+    description:
+      "A React Native personal finance app for managing daily income and expenses with budgets, reports, reminders, and backup/restore support.",
+    tags: ["React Native", "Expo", "Local Storage", "Dark Mode", "Finance App"],
+    href: "https://expo.dev/artifacts/eas/bdvh9CMTuSucwV15uErcWi.apk",
+    highlights: [
+      "Built category-based income and expense tracking with date-wise history filters",
+      "Added budgets, recurring transactions, reminders, and backup/restore support",
+      "Created visual summaries and reports for a clearer personal finance overview",
+      "Implemented dark mode and local storage for a smooth mobile-first experience",
+    ],
+  },
 ];

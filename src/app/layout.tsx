@@ -36,7 +36,7 @@ export default function RootLayout({
             <AnimatedBackground />
             <div className="relative z-10">
               <SiteHeader />
-              <main className="mx-auto max-w-5xl px-4 py-16">{children}</main>
+              <main className="mx-auto max-w-5xl px-4 py-10 sm:py-12 md:py-16">{children}</main>
               <SiteFooter />
             </div>
           </div>
