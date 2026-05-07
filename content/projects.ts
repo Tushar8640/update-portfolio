@@ -5,47 +5,56 @@ export type Project = {
   tags: string[];
   href?: string;
   repo?: string;
+  frontendRepo?: string;
+  backendRepo?: string;
   highlights: string[];
 };
 
 export const projects: Project[] = [
   {
-    slug: "nextjs-dashboard",
-    title: "Next.js Dashboard UI",
+    slug: "starconnect-platform",
+    title: "StarConnect Platform",
     description:
-      "A modern dashboard layout with tables, filters, and form flows built with Next.js App Router, TypeScript, Tailwind, and shadcn/ui.",
-    tags: ["Next.js", "TypeScript", "Tailwind", "shadcn/ui"],
-    href: "https://example.com",
-    repo: "https://github.com/your-username/your-repo",
+      "A production-grade professional networking platform with real-time communication, webinars, scheduling, and scalable backend services.",
+    tags: ["Next.js", "React", "TypeScript", "NestJS", "Redis", "RabbitMQ", "Elasticsearch", "Socket.IO"],
+    href: "https://starconnect.com",
     highlights: [
-      "Reusable layout: sidebar + header + content",
-      "Accessible components and responsive UI",
-      "Form handling patterns (RHF + Zod)",
+      "Built platform features with Next.js, React, Redux, and TypeScript",
+      "Achieved about 100% Lighthouse performance score for faster load speed and UX",
+      "Developed chat, video call, webinar, and scheduling workflows for real-time user interaction",
+      "Contributed to NestJS microservices architecture with Redis, RabbitMQ, Elasticsearch, JWT, and MySQL",
     ],
   },
   {
-    slug: "nest-api-foundation",
-    title: "NestJS API Foundation",
+    slug: "advanced-todo-app",
+    title: "Advanced Todo App",
     description:
-      "A scalable REST API foundation with JWT auth, RBAC, PostgreSQL schema design, Prisma migrations, and Swagger docs.",
-    tags: ["NestJS", "PostgreSQL", "Prisma", "JWT", "RBAC"],
-    repo: "https://github.com/your-username/your-repo",
+      "A full-stack single-page todo management app with JWT authentication, Redux state management, and installable PWA support.",
+    tags: ["React", "Tailwind", "Redux", "Express", "MongoDB", "Mongoose", "JWT", "PWA"],
+    href: "https://advanced-rtk-todo.netlify.app/",
+    frontendRepo: "https://github.com/Tushar8640/rtk-todo-app",
+    backendRepo: "https://github.com/Tushar8640/todo-server",
     highlights: [
-      "Auth + RBAC guards",
-      "Prisma schema + migrations",
-      "Swagger/OpenAPI documentation",
+      "Built JWT token-based authentication for protected todo workflows",
+      "Designed the app as a responsive single-page application with Redux-powered state management",
+      "Added PWA support so users can install it on Android, iOS, and Windows",
+      "Implemented todo create, edit, and management features with Express, Mongoose, and MongoDB",
     ],
   },
   {
-    slug: "bugfix-case-study",
-    title: "Bug Fix / Feature Case Study",
+    slug: "library-management-website",
+    title: "Library Management Website",
     description:
-      "A small case study showing how I reproduce issues, fix root causes, and deliver clean patches with verification steps.",
-    tags: ["Debugging", "React", "Next.js", "TypeScript"],
+      "A full-stack single-page library management website with JWT authentication, separate admin and user dashboards, and real-time notifications.",
+    tags: ["React", "Tailwind", "Redux", "Node.js", "MongoDB", "JWT", "Socket.IO"],
+    href: "https://amathlib.netlify.app/",
+    frontendRepo: "https://github.com/israt-emu/Library-management-frontend",
+    backendRepo: "https://github.com/israt-emu/Library-management-backend",
     highlights: [
-      "Reproduction steps + root cause analysis",
-      "Minimal safe fix with regression check",
-      "Clear delivery notes and next steps",
+      "Created separate dashboards for admins and users with protected routes",
+      "Enabled users to borrow or request books while admins manage inventory and requests",
+      "Added real-time notifications with Socket.IO for user and admin updates",
+      "Built backend APIs with Node.js, MongoDB, JWT authentication, and Redux-powered frontend state",
     ],
   },
 ];

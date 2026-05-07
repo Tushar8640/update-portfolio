@@ -10,7 +10,7 @@ import { siteConfig } from "@/lib/site";
 
 export default function Home() {
   const posts = getAllPosts().slice(0, 2);
-  const featuredProjects = projects.slice(0, 2);
+  const featuredProjects = projects.slice(0, 3);
 
   return (
     <div className="space-y-24">
@@ -54,8 +54,115 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Projects section - hidden for now */}
-      {/* <section className="space-y-8">
+      <section className="space-y-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">
+            <span className="relative z-10">Experience</span>
+            <span className="absolute -left-4 -top-4 -z-10 h-16 w-16 bg-primary/10 rounded-full blur-2xl" />
+          </h2>
+        </div>
+
+        <div className="grid gap-6">
+          {/* StarConnect Experience */}
+          <SpotlightCard className="p-6 group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                    Software Engineer (Full Stack)
+                  </h3>
+                  <p className="text-lg text-muted-foreground mt-1">StarConnect, Dhaka</p>
+                </div>
+                <p className="text-sm text-muted-foreground shrink-0">
+                  July 2025 - Present
+                </p>
+              </div>
+              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+                <li>Built production-grade platform features with Next.js, React, and TypeScript</li>
+                <li>Achieved about 100% Lighthouse performance score through frontend optimization</li>
+                <li>Delivered real-time chat, video calls, webinars, and scheduling workflows</li>
+                <li>Contributed to backend architecture and microservices with NestJS, RabbitMQ, Redis, and Elasticsearch</li>
+              </ul>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Next.js</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">React</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">TypeScript</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">NestJS</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">RabbitMQ</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Redis</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Elasticsearch</Badge>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* IdeaChord Experience */}
+          <SpotlightCard className="p-6 group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                    Full Stack Developer
+                  </h3>
+                  <p className="text-lg text-muted-foreground mt-1">IdeaChord Inc, Dhaka</p>
+                </div>
+                <p className="text-sm text-muted-foreground shrink-0">
+                  July 2023 - July 2025
+                </p>
+              </div>
+              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+                <li>Developed university student management and beneficiary fund management systems with Next.js, NestJS, Prisma, and MySQL</li>
+                <li>Built optimized APIs, role-based authentication, and responsive administrative dashboards</li>
+                <li>Improved database performance and maintainability for operational workflows</li>
+                <li>Delivered SaaS and business platforms using Next.js, NestJS, Express, PostgreSQL, MongoDB, Prisma, and JWT</li>
+              </ul>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Next.js</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">NestJS</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Prisma</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">MySQL</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">PostgreSQL</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">MongoDB</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">JWT</Badge>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* Zivaka Experience */}
+          <SpotlightCard className="p-6 group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                    Web Developer
+                  </h3>
+                  <p className="text-lg text-muted-foreground mt-1">Zivaka LLP, Kolkata, India</p>
+                </div>
+                <p className="text-sm text-muted-foreground shrink-0">
+                  Jan 2022 - Aug 2022
+                </p>
+              </div>
+              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
+                <li>Developed scalable REST APIs with Node.js, Express, MongoDB, and Mongoose</li>
+                <li>Built a real estate business website with React for apartment sales and property listings</li>
+                <li>Created admin dashboard workflows for property updates, client interactions, and business operations</li>
+              </ul>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">React</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Node.js</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Express</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">MongoDB</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Bootstrap</Badge>
+                <Badge variant="outline" className="bg-primary/5 border-primary/10">Material UI</Badge>
+              </div>
+            </div>
+          </SpotlightCard>
+        </div>
+      </section>
+
+      <section className="space-y-8">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">
              <span className="relative z-10">Featured Projects</span>
@@ -63,7 +170,7 @@ export default function Home() {
           </h2>
           <Button variant="ghost" className="group" asChild>
             <Link href="/projects">
-              View all 
+              View all
               <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
             </Link>
           </Button>
@@ -87,7 +194,7 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              <div className="mt-8 flex gap-4 text-sm font-medium">
+              <div className="mt-8 flex flex-wrap gap-4 text-sm font-medium">
                 {p.href && (
                   <a href={p.href} target="_blank" rel="noreferrer" className="flex items-center text-primary transition-opacity hover:opacity-80">
                     Live Demo <span className="sr-only">for {p.title}</span>
@@ -98,114 +205,19 @@ export default function Home() {
                     Code <span className="sr-only">for {p.title}</span>
                   </a>
                 )}
+                {p.frontendRepo && (
+                  <a href={p.frontendRepo} target="_blank" rel="noreferrer" className="flex items-center text-muted-foreground transition-colors hover:text-foreground">
+                    Frontend Code <span className="sr-only">for {p.title}</span>
+                  </a>
+                )}
+                {p.backendRepo && (
+                  <a href={p.backendRepo} target="_blank" rel="noreferrer" className="flex items-center text-muted-foreground transition-colors hover:text-foreground">
+                    Backend Code <span className="sr-only">for {p.title}</span>
+                  </a>
+                )}
               </div>
             </SpotlightCard>
           ))}
-        </div>
-      </section> */}
-
-      <section className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">
-            <span className="relative z-10">Experience</span>
-            <span className="absolute -left-4 -top-4 -z-10 h-16 w-16 bg-primary/10 rounded-full blur-2xl" />
-          </h2>
-        </div>
-
-        <div className="grid gap-6">
-          {/* StarConnect Experience */}
-          <SpotlightCard className="p-6 group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
-                    Software Engineer (Frontend)
-                  </h3>
-                  <p className="text-lg text-muted-foreground mt-1">StarConnect, Dhaka</p>
-                </div>
-                <p className="text-sm text-muted-foreground shrink-0">
-                  July 2025 - Present
-                </p>
-              </div>
-              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
-                <li>Built and optimized features using Next.js, React, TypeScript, and ShadCN UI</li>
-                <li>Integrated real-time communication, scheduling, and expert-user interaction systems</li>
-                <li>Collaborated with cross-functional teams on scalable, user-centric solutions</li>
-                <li>Participated in architectural decisions for continuous product improvements</li>
-              </ul>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Next.js</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">React</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">TypeScript</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">ShadCN UI</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Real-time Communication</Badge>
-              </div>
-            </div>
-          </SpotlightCard>
-
-          {/* IdeaChord Experience */}
-          <SpotlightCard className="p-6 group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
-                    Full Stack Developer
-                  </h3>
-                  <p className="text-lg text-muted-foreground mt-1">IdeaChord Inc, Dhaka</p>
-                </div>
-                <p className="text-sm text-muted-foreground shrink-0">
-                  July 2023 - July 2025
-                </p>
-              </div>
-              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
-                <li>Designed and developed company website using HTML, JavaScript, and Firebase</li>
-                <li>Created e-commerce site and dashboard with Next.js and Supabase</li>
-                <li>Built micro-SaaS projects with Next.js, Express, MongoDB, and PostgreSQL</li>
-                <li>Implemented JWT authentication and REST APIs with Prisma ORM</li>
-              </ul>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Next.js</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Express</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">MongoDB</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">PostgreSQL</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Prisma</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Supabase</Badge>
-              </div>
-            </div>
-          </SpotlightCard>
-
-          {/* Zivaka Experience */}
-          <SpotlightCard className="p-6 group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
-                    Web Developer
-                  </h3>
-                  <p className="text-lg text-muted-foreground mt-1">Zivaka LLP, Kolkata, India</p>
-                </div>
-                <p className="text-sm text-muted-foreground shrink-0">
-                  Jan 2022 - Aug 2022
-                </p>
-              </div>
-              <ul className="text-muted-foreground leading-relaxed space-y-2 list-disc list-inside">
-                <li>Designed front-end interfaces with React, Bootstrap, and Material UI</li>
-                <li>Integrated RESTful APIs for seamless data communication</li>
-                <li>Developed backend REST APIs using Node.js, Express, and MongoDB</li>
-              </ul>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">React</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Node.js</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Express</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">MongoDB</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Bootstrap</Badge>
-                <Badge variant="outline" className="bg-primary/5 border-primary/10">Material UI</Badge>
-              </div>
-            </div>
-          </SpotlightCard>
         </div>
       </section>
 

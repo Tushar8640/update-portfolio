@@ -108,6 +108,26 @@ export function ProjectsFilter({ projects }: { projects: Project[] }) {
                   View Code
                 </a>
               ) : null}
+              {p.frontendRepo ? (
+                <a
+                  href={p.frontendRepo}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-muted-foreground link-hover underline underline-offset-4"
+                >
+                  Frontend Code
+                </a>
+              ) : null}
+              {p.backendRepo ? (
+                <a
+                  href={p.backendRepo}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-muted-foreground link-hover underline underline-offset-4"
+                >
+                  Backend Code
+                </a>
+              ) : null}
             </div>
           </SpotlightCard>
         ))}

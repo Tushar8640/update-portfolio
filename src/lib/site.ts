@@ -6,7 +6,7 @@ export const siteConfig = {
   location: "Bangladesh",
   email: "tusar.imran.dev@gmail.com",
   links: {
-    github: "https://github.com/your-username",
-    linkedin: "https://www.linkedin.com/in/your-username/",
+    github: "https://github.com/Tushar8640",
+    linkedin: "https://www.linkedin.com/in/tusar-imran-680149227/",
   },
 } as const;

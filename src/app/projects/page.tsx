@@ -14,7 +14,7 @@ export default function ProjectsPage() {
           Projects
         </h1>
         <p className="text-lg text-muted-foreground">
-          A small selection of work across Next.js UI, backend APIs, and debugging.
+          Selected full-stack work across real-time platforms, admin systems, and scalable backend services.
         </p>
       </div>
 
