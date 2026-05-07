@@ -19,7 +19,7 @@ export default function AboutPage() {
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">What I build</h2>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">Next.js (App Router)</Badge>
+          <Badge variant="secondary">Next.js</Badge>
           <Badge variant="secondary">React + TypeScript</Badge>
           <Badge variant="secondary">Tailwind + shadcn/ui</Badge>
           <Badge variant="secondary">Redux + RTK Query</Badge>

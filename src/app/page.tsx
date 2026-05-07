@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,7 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          {["Next.js (App Router)", "React", "TypeScript", "Tailwind", "shadcn/ui", "Node/NestJS", "PostgreSQL + Prisma"].map((tech) => (
+          {["Next.js", "React", "TypeScript", "Tailwind", "shadcn/ui", "Node/NestJS", "PostgreSQL + Prisma"].map((tech) => (
             <Badge 
               key={tech} 
               variant="secondary" 
@@ -43,6 +44,12 @@ export default function Home() {
           </Button>
           <Button asChild variant="outline" size="lg" className="rounded-full px-8 text-base bg-background/50 backdrop-blur transition-all hover:-translate-y-0.5">
             <Link href="/contact">Get in Touch</Link>
+          </Button>
+          <Button asChild variant="secondary" size="lg" className="rounded-full px-8 text-base transition-all hover:-translate-y-0.5">
+            <a href="/resume.pdf" download="Tusar-Imran-Full-stack-developer.pdf">
+              <Download className="mr-2 size-4" aria-hidden="true" />
+              Download Resume
+            </a>
           </Button>
         </div>
       </section>
