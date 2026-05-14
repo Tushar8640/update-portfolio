@@ -12,6 +12,33 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "shopnext-ecommerce",
+    title: "ShopNext — Discover Quality Products",
+    description:
+      "A production-ready e-commerce platform built with Next.js 16 (App Router), Prisma 7, and PostgreSQL. Features a full storefront, multi-step checkout, wishlist, reviews, and an admin dashboard with analytics, inventory, coupons, gift cards, flash sales, and a blog editor.",
+    tags: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Prisma",
+      "PostgreSQL",
+      "Tailwind",
+      "shadcn/ui",
+      "Redux Toolkit",
+      "Supabase",
+      "E-commerce",
+    ],
+    href: "https://example.com",
+    repo: "https://github.com/your-username/shopnext",
+    highlights: [
+      "Full storefront with multi-step checkout, wishlist, and product reviews",
+      "Admin dashboard: analytics, inventory, coupons, gift cards, and flash sales",
+      "Built-in blog editor for content marketing and SEO",
+      "Type-safe data layer with Prisma 7 and PostgreSQL",
+      "Auth and storage powered by Supabase, state managed with Redux Toolkit",
+    ],
+  },
+  {
     slug: "starconnect-platform",
     title: "StarConnect Platform",
     description:
