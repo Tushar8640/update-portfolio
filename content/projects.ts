@@ -28,8 +28,8 @@ export const projects: Project[] = [
       "Supabase",
       "E-commerce",
     ],
-    href: "https://example.com",
-    repo: "https://github.com/your-username/shopnext",
+    href: "https://shopnext-lyart.vercel.app/",
+    repo: "https://github.com/Tushar8640/ecom",
     highlights: [
       "Full storefront with multi-step checkout, wishlist, and product reviews",
       "Admin dashboard: analytics, inventory, coupons, gift cards, and flash sales",
@@ -98,4 +98,35 @@ export const projects: Project[] = [
       "Implemented dark mode and local storage for a smooth mobile-first experience",
     ],
   },
+  {
+  slug: "cpbs-admission-system",
+  title: "CPBS Admission System — Online Applications with Manual Payment Verification",
+  description:
+    "A bilingual (Bengali/English) Next.js 14 admission platform for the CPBS organization in Bangladesh. Students apply online, pay via bKash/Nagad/Rocket, and download PDF admit cards once an admin verifies the transaction. Includes a JWT-secured admin dashboard for managing applicants, schools, members, and database backups.",
+  tags: [
+    "Next.js 14",
+    "App Router",
+    "React",
+    "TypeScript",
+    "Prisma",
+    "PostgreSQL",
+    "Tailwind CSS",
+    "shadcn/ui",
+    "JWT",
+    "bcrypt",
+    "PDFKit",
+    "Puppeteer",
+    "Zod",
+    "React Hook Form",
+    "Framer Motion",
+  ],
+  href: "https://cpbs.vercel.app",
+  highlights: [
+    "End-to-end admission flow: online application, manual bKash/Nagad/Rocket verification, auto roll-number generation, and PDF admit card download with re-download support",
+    "JWT + bcrypt admin dashboard with super-admin controls for applicants, schools, members, and CSV/Excel export via XLSX",
+    "Server-rendered PDF admit cards generated with PDFKit and Puppeteer (Sparticuz Chromium) from an HTML template",
+    "Type-safe data layer with Prisma 5 and PostgreSQL, versioned migrations, seed scripts, and built-in JSON backup/restore tooling",
+    "Bilingual marketing site with shadcn/ui, Tailwind, Embla carousels, and Framer Motion animations, plus a keep-alive logging endpoint to prevent serverless DB cold starts",
+  ],
+}
 ];
